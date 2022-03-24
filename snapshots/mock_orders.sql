@@ -1,3 +1,5 @@
+{#
+
 {% snapshot mock_orders %}
 
 {% set new_schema = target.schema + '_snapshot' %}
@@ -17,3 +19,4 @@ select * from analytics.{{target.schema}}.mock_orders
 
 {% endsnapshot %}
 	
+#}
