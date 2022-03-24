@@ -2,7 +2,7 @@ version: 2
 
 sources:
     - name: snowplow
-      database: raw
+      #database: raw
       tables:
         - name: events
           loaded_at_field: collector_timestamp
