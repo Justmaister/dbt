@@ -1,3 +1,5 @@
+{#
+
 {% snapshot orders_snapshot %}
 
 {{
@@ -14,3 +16,5 @@
 select id, price from {{ source('jaffle_shop', 'orders') }}
 
 {% endsnapshot %}
+
+#}
