@@ -8,19 +8,49 @@ sources:
       tables:
         - name: customers
           description: Raw customers data.
+          config:
+            elementary:
+              timestamp_column: _timestamp_at
+          tests:
+            - elementary.table_anomalies:
+                table_anomalies:
+                  - freshness
+                  - row_count
+                  - schema_changes
+                tags: ['elementary']
+                sensitivity: 3
+                config:
+                  days_back: 90
+                  severity: error
+                timestamp_column: _timestamp_at
           columns:
             - name: id
               description: Primary key for customers.
-              tests: 
+              tests:
                 - unique
                 - not_null
 
         - name: orders
           description: Raw orders data.
+          config:
+            elementary:
+              timestamp_column: _timestamp_at
+          tests:
+            - elementary.table_anomalies:
+                table_anomalies:
+                  - freshness
+                  - row_count
+                  - schema_changes
+                tags: ['elementary']
+                sensitivity: 3
+                config:
+                  days_back: 90
+                  severity: error
+                timestamp_column: _timestamp_at
           columns:
             - name: id
               description: Primary key for orders.
-              tests: 
+              tests:
                 - unique
                 - not_null
           loaded_at_field: _etl_loaded_at

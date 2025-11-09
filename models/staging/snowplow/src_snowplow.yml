@@ -1,10 +1,25 @@
-version: 2 
+version: 2
 
 sources:
     - name: snowplow
       #database: raw
       tables:
         - name: events
+          config:
+            elementary:
+              timestamp_column: _timestamp_at
+          tests:
+            - elementary.table_anomalies:
+                table_anomalies:
+                  - freshness
+                  - row_count
+                  - schema_changes
+                tags: ['elementary']
+                sensitivity: 3
+                config:
+                  days_back: 90
+                  severity: error
+                timestamp_column: _timestamp_at
           loaded_at_field: collector_timestamp
           freshness:
             error_after: {count: 1, period: hour}

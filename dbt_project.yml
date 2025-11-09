@@ -24,17 +24,37 @@ clean-targets:         # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
 
+seeds:
+  +enabled: true
+  +database: "{{ env_var('PROD_DATABASE') }}" #PROD
+  +schema: legacy
+  +quote_columns: False
 
-# Configuring models
-# Full documentation: https://docs.getdbt.com/docs/configuring-models
+vars:
+  warehouse_name: "{{ env_var('TRANSFORM_WAREHOUSE') }}"
+  valid_at: '{{ run_started_at.strftime("%Y-%m-%d %H:%M:%S%z") }}'
+  surrogate_key_treat_nulls_as_empty_strings: true
 
-# In this example config, we tell dbt to build all models in the example/ directory
-# as tables. These settings can be overridden in the individual model files
-# using the `{{ config(...) }}` macro.
+  tests_schema_name: '__TESTS'
+  days_back: 90
+  anomaly_sensitivity: 3
+  severity: error
+  disable_dbt_artifacts_autoupload: true
+  disable_run_results: false
+  disable_tests_results: false
+  disable_dbt_invocation_autoupload: false
+
 models:
+  +copy_grants: true
   jaffle_shop:
     marts:
       core:
           +materialized: table
     staging:
       +materialized: view
+
+snapshots:
+  snowflake:
+    target_database: "{{ env_var('SNAPSHOT_DATABASE') }}"
+    target_schema: "snapshots"
+    transient: false

@@ -6,6 +6,21 @@ sources:
       schema: stripe
       tables:
         - name: payment
+          config:
+            elementary:
+              timestamp_column: _timestamp_at
+          tests:
+            - elementary.table_anomalies:
+                table_anomalies:
+                  - freshness
+                  - row_count
+                  - schema_changes
+                tags: ['elementary']
+                sensitivity: 3
+                config:
+                  days_back: 90
+                  severity: error
+                timestamp_column: _timestamp_at
           loaded_at_field: _batched_at
           freshness:
               warn_after: {count: 12, period: hour}
