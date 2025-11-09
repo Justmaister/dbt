@@ -1,5 +1,3 @@
--- This only works on Snowflake as role are not used in BigQuery
-
 {% macro grant_select(database=target.database, schema=target.schema, role=target.role) %}
 
     {% set sql %}

@@ -1,3 +1,13 @@
+{{
+  config(
+    materialized='incremental',
+    unique_key='order_id',
+    incremental_strategy='merge',
+    cluster_by=['order_date'],
+    persist_docs={"relation": true, "columns": true},
+    schema=generate_schema_name('analytics'))
+}}
+
 with orders as  (
     select * from {{ ref('stg_orders' )}}
 ),
@@ -27,4 +37,8 @@ final as (
     left join order_payments using (order_id)
 )
 
-select * from final
+{{ deduplicate(
+    relation='final',
+    partition_by='order_date',
+    order_by="order_date DESC"
+) }}

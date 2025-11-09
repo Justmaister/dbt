@@ -11,7 +11,7 @@
      #}
 
     {% set schema_name = generate_schema_name(schema_name) %}
-    {% set filter_name = mng_dbt_utils.incremental_filter(source_column=column_name, target_column=None, timestamp_format=timestamp_format, partition_type=partition_type) %}
+    {% set filter_name = dbt_utils.incremental_filter(source_column=column_name, target_column=None, timestamp_format=timestamp_format, partition_type=partition_type) %}
 
     {% if is_incremental() %}
         DELETE FROM {{ schema_name }}.{{ table_name }} where {{ filter_name }}
