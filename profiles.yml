@@ -1,0 +1,16 @@
+config:
+  populate_cache: false
+
+datalakehouse:
+  target: databricks
+  outputs:
+    snowflake:
+      type: snowflake
+      account: dbt-account.eu-west-1
+      user: "{{ env_var('snowflake_user') }}"
+      private_key_path: "{{ env_var('PRIVATE_KEY_FILE') }}"
+      private_key_passphrase: "{{ env_var('PRIVATE_KEY_PASSPHRASE') }}"
+      role: "{{ env_var('snowflake_env') + '_role_dbt' }}"
+      database: "{{ env_var('snowflake_env') }}"
+      threads: 4
+      query_tag: DBT
