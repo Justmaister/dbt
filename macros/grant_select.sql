@@ -1,15 +1,15 @@
 -- This only works on Snowflake as role are not used in BigQuery
 
-{% macro grant_select(schema=target.schema, role=target.role) %}
+{% macro grant_select(database=target.database, schema=target.schema, role=target.role) %}
 
-  {% set sql %}
-  grant usage on schema {{ schema }} to role {{ role }};
-  grant select on all tables in schema {{ schema }} to role {{ role }};
-  grant select on all views in schema {{ schema }} to role {{ role }};
-  {% endset %}
+    {% set sql %}
+        grant usage on schema {{ database }}.{{ schema }} to role {{ role }};
+        grant select on all tables in schema {{ database }}.{{ schema }} to role {{ role }};
+        grant select on all views in schema {{ database }}.{{ schema }} to role {{ role }};
+    {% endset %}
 
-  {{ log('Granting select on all tables and views in schema ' ~ target.schema ~ ' to role ' ~ role, info=True) }}
-  {% do run_query(sql) %}
-  {{ log('Privileges granted', info=True) }}
+    {{ log('Granting select on all tables and views in schema ' ~ target.schema ~ ' to role ' ~ role, info=True) }}
+    {% do run_query(sql) %}
+    {{ log('Privileges granted', info=True) }}
 
 {% endmacro %}
