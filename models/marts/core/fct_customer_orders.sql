@@ -1,6 +1,14 @@
+{{
+  config(
+    materialized='incremental',
+    unique_key='customer_id',
+    incremental_strategy='merge',
+    persist_docs={"relation": true, "columns": true},
+    schema=generate_schema_name('analytics'))
+}}
+
 with
 
--- Import CTEs
 customers as (
 
     select * from {{ source('jaffle_shop', 'customers') }}
@@ -19,13 +27,12 @@ payments as (
 
 ),
 
--- Logical CTEs
 customers as (
 
-    select 
+    select
 
-        first_name || ' ' || last_name as name, 
-        * 
+        first_name || ' ' || last_name as name,
+        *
 
     from customers
 
@@ -33,10 +40,10 @@ customers as (
 
 a as (
 
-      select 
+      select
 
         row_number() over (
-            partition by user_id 
+            partition by user_id
             order by order_date, id
         ) as user_order_seq,
         *
@@ -45,12 +52,12 @@ a as (
 
 ),
 
-b as ( 
+b as (
 
-    select 
+    select
 
-        first_name || ' ' || last_name as name, 
-        * 
+        first_name || ' ' || last_name as name,
+        *
 
     from customers
 
@@ -58,7 +65,7 @@ b as (
 
 customer_order_history as (
 
-    select 
+    select
 
         b.id as customer_id,
         b.name as full_name,
@@ -67,37 +74,37 @@ customer_order_history as (
 
         min(order_date) as first_order_date,
 
-        min(case 
-            when a.status not in ('returned','return_pending') 
-            then order_date 
+        min(case
+            when a.status not in ('returned','return_pending')
+            then order_date
         end) as first_non_returned_order_date,
 
-        max(case 
-            when a.status not in ('returned','return_pending') 
-            then order_date 
+        max(case
+            when a.status not in ('returned','return_pending')
+            then order_date
         end) as most_recent_non_returned_order_date,
 
         coalesce(max(user_order_seq),0) as order_count,
 
-        coalesce(count(case 
-            when a.status != 'returned' 
+        coalesce(count(case
+            when a.status != 'returned'
             then 1 end),
             0
         ) as non_returned_order_count,
 
-        sum(case 
-            when a.status not in ('returned','return_pending') 
-            then round(c.amount/100.0,2) 
-            else 0 
+        sum(case
+            when a.status not in ('returned','return_pending')
+            then round(c.amount/100.0,2)
+            else 0
         end) as total_lifetime_value,
 
-        sum(case 
-            when a.status not in ('returned','return_pending') 
-            then round(c.amount/100.0,2) 
-            else 0 
+        sum(case
+            when a.status not in ('returned','return_pending')
+            then round(c.amount/100.0,2)
+            else 0
         end)
-        / nullif(count(case 
-            when a.status not in ('returned','return_pending') 
+        / nullif(count(case
+            when a.status not in ('returned','return_pending')
             then 1 end),
             0
         ) as avg_non_returned_order_value,
@@ -118,10 +125,9 @@ customer_order_history as (
 
 ),
 
--- Final CTEs 
 final as (
 
-    select 
+    select
 
         orders.id as order_id,
         orders.user_id as customer_id,
@@ -149,5 +155,4 @@ final as (
 
 )
 
--- Simple Select Statement
 select * from final
